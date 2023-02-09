@@ -1,16 +1,16 @@
-import * as cheerio from 'cheerio'
+import scrape from './services.js'
+import { LEAGUE_FIELDS } from './types.js'
 
-const data = await fetch('https://resultados.as.com/resultados/futbol/primera/clasificacion/?omnil=mpal')
-const html = await data.text()
+const $ = await scrape('https://resultados.as.com/resultados/futbol/primera/clasificacion/?omnil=mpal')
 
-const $ = cheerio.load(html)
-
-const teamBoard = []
-
-$('.tabla-datos tbody tr').each((index, el) => {
-  const team = $(el).find('.nombre-equipo').text()
-  const points = $(el).find('.destacado').text()
-  teamBoard.push({ team, points })
+const teams = []
+const trEL = $('.tabla-datos tbody tr')
+trEL.each((key, element) => {
+  const data = Object.entries(LEAGUE_FIELDS).map(([key, selector]) => {
+    const value = $(element).find(selector).text()
+    return value
+  })
+  teams.push(data)
 })
 
-console.log(teamBoard)
+console.log(teams)
